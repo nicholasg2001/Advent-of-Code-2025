@@ -9,7 +9,14 @@ import (
 	"strings"
 )
 
-func solve(rotation string, ans int, position int) (int, int) {
+func abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+
+func solvePartOne(rotation string, ans int, position int) (int, int) {
 
 	rotation = strings.TrimSpace(rotation)
 	direction := 1
@@ -30,6 +37,46 @@ func solve(rotation string, ans int, position int) (int, int) {
 	return ans, position
 }
 
+func solvePartTwo(rotation string, ans int, position int) (int, int) {
+
+	rotation = strings.TrimSpace(rotation)
+	direction := 1
+
+	if rotation[0] == 'L' {
+		direction = -1
+	}
+
+	spacesToMove, _ := strconv.Atoi(rotation[1:])
+	spacesToMove *= direction
+	absSpacesToMove := abs(spacesToMove)
+
+	initPosition := position
+	cycles := 0
+
+	var firstZero int
+
+	if initPosition == 0 {
+		firstZero = 100
+	} else if direction == 1 {
+		firstZero = 100 - initPosition
+	} else {
+		firstZero = initPosition
+	}
+
+	if absSpacesToMove >= firstZero {
+		cycles++
+		remainingDistance := absSpacesToMove - firstZero
+		cycles += remainingDistance / 100
+	}
+
+	sum := position + spacesToMove
+	position = ((sum%100 + 100) % 100)
+
+	ans += cycles
+
+	return ans, position
+}
+
 func main() {
 
 	ans := 0
@@ -44,7 +91,7 @@ func main() {
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		ans, position = solve(scanner.Text(), ans, position)
+		ans, position = solvePartTwo(scanner.Text(), ans, position)
 	}
 
 	if err := scanner.Err(); err != nil {
